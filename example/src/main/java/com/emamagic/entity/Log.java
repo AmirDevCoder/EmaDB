@@ -1,7 +1,6 @@
 package com.emamagic.entity;
 
 import com.emamagic.annotation.Entity;
-import com.emamagic.annotation.ConflictUpdate;
 import com.emamagic.annotation.Id;
 import com.emamagic.conf.DB;
 import org.bson.types.ObjectId;

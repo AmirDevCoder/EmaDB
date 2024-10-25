@@ -31,7 +31,7 @@ public class PostgresUpsertCommand<T> extends PostgresEmaCommand<T, Optional<T>>
             // TODO: check only once
             TableCreator.getInstance(connection).createTableIfNotExist(entity);
 
-            boolean isExist = rowExistForIdUpdate(entity, clazz, fields) || rowExistForConflictUpdate(entity, clazz, fields);
+            boolean isExist = rowExistForIdUpdate(entity, clazz, fields) || rowExistForUniqueForUpdate(entity, clazz, fields);
             if (isExist) {
                 return updateRow(entity, clazz, fields);
             } else {
@@ -61,13 +61,13 @@ public class PostgresUpsertCommand<T> extends PostgresEmaCommand<T, Optional<T>>
         }
     }
 
-    private boolean rowExistForConflictUpdate(T entity, Class<?> clazz, Field[] fields) throws IllegalAccessException, SQLException {
-        boolean isExist = ReflectionUtil.isConflictUpdateExist(fields);
+    private boolean rowExistForUniqueForUpdate(T entity, Class<?> clazz, Field[] fields) throws IllegalAccessException, SQLException {
+        boolean isExist = ReflectionUtil.isUniqueForUpdateExist(fields);
         if (!isExist) return false;
-        var conflictUpdateData = ReflectionUtil.findConflictUpdateField(entity, clazz);
-        String query = "select 1 from " + ReflectionUtil.findTableName(clazz) + " where " + conflictUpdateData.name() + " = ?";
+        var uniqueForUpdateData = ReflectionUtil.findUniqueForUpdateField(entity, clazz);
+        String query = "select 1 from " + ReflectionUtil.findTableName(clazz) + " where " + uniqueForUpdateData.name() + " = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setObject(1, conflictUpdateData.value());
+            stmt.setObject(1, uniqueForUpdateData.value());
             return stmt.executeQuery().next();
         }
     }
@@ -88,11 +88,11 @@ public class PostgresUpsertCommand<T> extends PostgresEmaCommand<T, Optional<T>>
                     }
                 }).map(field -> field.getName() + " = ?")
                 .collect(Collectors.joining(", "));
-        var conflictUpdateData = ReflectionUtil.findConflictUpdateField(entity, clazz);
+        var uniqueForUpdateData = ReflectionUtil.findUniqueForUpdateField(entity, clazz);
         queryBuilder
                 .append(conditions)
                 .append(" where ")
-                .append(conflictUpdateData.name())
+                .append(uniqueForUpdateData.name())
                 .append(" = ?")
                 .append(" returning *");
         String query = queryBuilder.toString();
@@ -105,7 +105,7 @@ public class PostgresUpsertCommand<T> extends PostgresEmaCommand<T, Optional<T>>
                     stmt.setObject(counter++, field.get(entity));
                 }
             }
-            stmt.setObject(counter, conflictUpdateData.value());
+            stmt.setObject(counter, uniqueForUpdateData.value());
             ResultSet resultSet = stmt.executeQuery();
             if (resultSet.next()) {
                 return Optional.of((T) EntityMapperFactory.fromResultSet(resultSet).mapTo(entity.getClass()));

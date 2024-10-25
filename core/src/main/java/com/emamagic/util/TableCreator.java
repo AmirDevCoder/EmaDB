@@ -1,6 +1,6 @@
 package com.emamagic.util;
 
-import com.emamagic.annotation.ConflictUpdate;
+import com.emamagic.annotation.UniqueForUpdate;
 import com.emamagic.annotation.Id;
 
 import java.lang.reflect.Field;
@@ -46,7 +46,7 @@ public class TableCreator {
                     .append(" ")
                     .append(columnType);
 
-            if (field.isAnnotationPresent(ConflictUpdate.class)) {
+            if (field.isAnnotationPresent(UniqueForUpdate.class)) {
                 queryBuilder.append(" UNIQUE");
             }
 

@@ -3,7 +3,7 @@ package com.emamagic.util;
 import com.emamagic.annotation.Entity;
 import com.emamagic.annotation.Id;
 import com.emamagic.annotation.IgnoreRow;
-import com.emamagic.annotation.ConflictUpdate;
+import com.emamagic.annotation.UniqueForUpdate;
 
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
@@ -39,21 +39,21 @@ public final class ReflectionUtil {
         return entityAnnotation.name();
     }
 
-    public static <T> ConflictUpdateData findConflictUpdateField(T entity, Class<?> clazz) throws IllegalAccessException {
+    public static <T> UniqueForUpdateData findUniqueForUpdateField(T entity, Class<?> clazz) throws IllegalAccessException {
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);
-            if (field.isAnnotationPresent(ConflictUpdate.class)) {
-                return new ConflictUpdateData(field.getName(), field.get(entity));
+            if (field.isAnnotationPresent(UniqueForUpdate.class)) {
+                return new UniqueForUpdateData(field.getName(), field.get(entity));
             }
         }
 
         var idData = findIdField(entity, clazz);
-        return new ConflictUpdateData(idData.name(), idData.value());
+        return new UniqueForUpdateData(idData.name(), idData.value());
     }
 
-    public static boolean isConflictUpdateExist(Field[] fields) {
+    public static boolean isUniqueForUpdateExist(Field[] fields) {
         for (Field field : fields) {
-            if (field.isAnnotationPresent(ConflictUpdate.class)) {
+            if (field.isAnnotationPresent(UniqueForUpdate.class)) {
                 return true;
             }
         }
@@ -74,6 +74,6 @@ public final class ReflectionUtil {
     public record IdData(String name, Object value) {
     }
 
-    public record ConflictUpdateData(String name, Object value) {
+    public record UniqueForUpdateData(String name, Object value) {
     }
 }

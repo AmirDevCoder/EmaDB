@@ -2,7 +2,6 @@ package com.emamagic.processor;
 
 import com.emamagic.annotation.Entity;
 import com.emamagic.annotation.Id;
-import com.emamagic.annotation.ConflictUpdate;
 import com.google.auto.service.AutoService;
 
 import javax.annotation.processing.*;

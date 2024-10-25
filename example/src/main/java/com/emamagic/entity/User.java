@@ -1,6 +1,6 @@
 package com.emamagic.entity;
 
-import com.emamagic.annotation.ConflictUpdate;
+import com.emamagic.annotation.UniqueForUpdate;
 import com.emamagic.annotation.Entity;
 import com.emamagic.annotation.Id;
 import com.emamagic.conf.DB;
@@ -11,7 +11,7 @@ public class User {
     @Id
     private Integer id;
     private String name;
-    @ConflictUpdate
+    @UniqueForUpdate
     private String email;
 
     public String getName() {
