@@ -43,24 +43,33 @@ git clone https://github.com/AmirDevCoder/EmaDB.git
        public String getPassword() { return "1234"; }
    }
 
-## Define Entities And Table Naming
+### Defining Entities and Table Naming
 
-When defining an entity with `@Entity`, specifying a table name is optional. If not specified, EmaDB will automatically create a table name by converting the class name to lowercase and pluralizing it (e.g., `User` → `users`).
+When defining an entity with `@Entity`, specifying a table name is optional. If a name is not provided, EmaDB automatically generates one by converting the class name to lowercase and pluralizing it (e.g., `User` becomes `users`). This way, you can avoid manual naming unless a specific table name is required.
 
-Use `@Entity` to define tables/entities. Annotate primary keys with `@Id`, and use `@UniqueForUpdate` if a field (other than the primary key) should be used for unique updates.
+#### Key Annotations
 
-It must has exactly one no-argument constructor
+- **`@Entity`** - Marks the class as an entity to map to a database table.
+- **`@Id`** - Specifies the primary key field. EmaDB currently supports only `Integer` for primary keys.
+- **`@UniqueForUpdate`** - Marks a field as unique, allowing updates to target this field.
+- **`@IgnoreRow`** - When applied to a field, this annotation ensures that the field is ignored during database mapping. This is helpful for fields used only within the Java project and not intended for storage in the database.
+
+Each entity must also include a no-argument constructor for compatibility with EmaDB.
+
+#### Example
 
 ```java
 @Entity(db = DB.POSTGRESQL, name = "users")
 public class User {
     @Id
-    private Integer id; // only supports Integer for @Id
+    private Integer id; // Primary key (supports Integer only)
     private String name;
-    private String email;
-
+    
     @UniqueForUpdate
-    private String email; // Updates can target this unique field
+    private String email; // Unique field for updates
+
+    @IgnoreRow
+    private String sessionToken; // Used in application only, not stored in DB
 
     // No-argument constructor
     public User() {}
