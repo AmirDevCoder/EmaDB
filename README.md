@@ -49,6 +49,8 @@ When defining an entity with `@Entity`, specifying a table name is optional. If 
 
 Use `@Entity` to define tables/entities. Annotate primary keys with `@Id`, and use `@UniqueForUpdate` if a field (other than the primary key) should be used for unique updates.
 
+It must has exactly one no-argument constructor
+
 ```java
 @Entity(db = DB.POSTGRESQL, name = "users")
 public class User {
@@ -59,6 +61,9 @@ public class User {
 
     @UniqueForUpdate
     private String email; // Updates can target this unique field
+
+    // No-argument constructor
+    public User() {}
 }
 ```
 
