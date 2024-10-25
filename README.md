@@ -74,17 +74,19 @@ Use the following methods to perform basic CRUD operations.
 ```java
 public class Main {
     public static void main(String[] args) {
+
         // Insert or update a user record
-        EmaDB.upsert(getUser());
+        Optional<User> upsertedUser = EmaDB.upsert(getUser());
 
         // Delete records
-        EmaDB.delete();
+        boolean isDeleted = EmaDB.delete(getUser());
 
         // Read records
-        EmaDB.read();
+        Optional<List<User>> users = EmaDB.read(User.class);
 
         // Close the database connection
         EmaDB.close();
+
     }
 
     private static User getUser() {
